@@ -1,0 +1,1 @@
+const bitfinexAPIVersion = 'v1'
