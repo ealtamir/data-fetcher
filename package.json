@@ -9,11 +9,16 @@
   "dependencies": {
     "async": "^2.6.0",
     "build-url": "^1.0.10",
+    "knex": "^0.14.0",
     "lodash": "^4.17.4",
+    "pg": "^7.4.0",
     "request": "^2.83.0",
+    "ts-node": "^3.3.0",
     "typescript": "^2.6.1"
   },
   "devDependencies": {
+    "@types/knex": "0.0.64",
+    "@types/pg": "^7.1.5",
     "@types/async": "^2.0.45",
     "@types/lodash": "^4.14.82",
     "@types/request": "^2.0.7"
