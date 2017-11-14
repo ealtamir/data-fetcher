@@ -46,6 +46,7 @@ class BitfinexDataFetcher {
             if (error) {
                 params.callback(error, null)
             }
+            responseBody.symbol = params.symbol
             params.callback(null, responseBody as T)
         }
     }

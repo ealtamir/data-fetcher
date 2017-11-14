@@ -82,5 +82,6 @@ export {
     TradesPayload,
     BitfinexAPIParams,
     BitfinexSymbols,
-    BitfinexTradeEntry
+    BitfinexTradeEntry,
+    BitfinexBookEntry
 }

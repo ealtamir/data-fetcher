@@ -2,7 +2,10 @@ import * as _ from 'lodash'
 import * as stats from 'simple-statistics'
 import * as Bluebird from 'bluebird'
 import { knex, client } from './database'
-import {TickerPayload, TradesPayload, BitfinexTradeEntry} from './bitfinex_interfaces'
+import { 
+    TickerPayload, TradesPayload, BitfinexTradeEntry, 
+    BookPayload, BitfinexBookEntry
+} from './bitfinex_interfaces'
 import { Transaction } from 'knex';
 import { QueryResult } from 'pg';
 
@@ -19,25 +22,25 @@ abstract class Model {
 }
 
 class Ticker extends Model {
-    coin_id: string;
-    last_price: number;
-    bid: number;
-    ask: number;
-    mid: number;
-    low: number;
-    high: number;
-    volume: number;
-    transactions_buy_qty: number;
-    transactions_buy_coin_qty: number;
-    transactions_buy_mean_price: number;
-    transactions_buy_median_price: number;
-    transactions_buy_stdev_price: number;
-    transactions_sell_qty: number;
-    transactions_sell_coin_qty: number;
-    transactions_sell_mean_price: number;
-    transactions_sell_median_price: number;
-    transactions_sell_stdev_price: number;
-    timestamp: number;
+    coin_id: string
+    last_price: number
+    bid: number
+    ask: number
+    mid: number
+    low: number
+    high: number
+    volume: number
+    transactions_buy_qty: number
+    transactions_buy_coin_qty: number
+    transactions_buy_mean_price: number
+    transactions_buy_median_price: number
+    transactions_buy_stdev_price: number
+    transactions_sell_qty: number
+    transactions_sell_coin_qty: number
+    transactions_sell_mean_price: number
+    transactions_sell_median_price: number
+    transactions_sell_stdev_price: number
+    timestamp: number
 
     constructor(tickerPayload: TickerPayload, tradesPayload: TradesPayload) {
         super()
@@ -54,12 +57,12 @@ class Ticker extends Model {
     }
 
     private extractTradesPayloadData(payload: TradesPayload): void {
-        let buy_qty: number = 0;
-        let buy_coin_qty: number = 0;
+        let buy_qty: number = 0
+        let buy_coin_qty: number = 0
         let buy_prices: Array<number> = []
         let buy_amounts: Array<number> = []
-        let sell_qty: number = 0;
-        let sell_coin_qty: number = 0;
+        let sell_qty: number = 0
+        let sell_coin_qty: number = 0
         let sell_prices: Array<number> = []
         let sell_amounts: Array<number> = []
         _.each(payload.trades, (trade: BitfinexTradeEntry) => {
@@ -104,6 +107,36 @@ class Ticker extends Model {
 
 }
 
+
+class Book extends Model {
+    coin_id: string
+    asks: string
+    bids: string
+
+    constructor(bookPayload: BookPayload) {
+        super();
+        this.extractBookPayloadData(bookPayload)
+    }
+
+    extractBookPayloadData(bookPayload: BookPayload): void {
+        type accumulator = [number[], number[]]
+        const reducerFunction = (accumulator: accumulator, item: BitfinexBookEntry): accumulator => {
+            accumulator[0].push(+item.amount)
+            accumulator[1].push(+item.price)
+            return accumulator
+        }
+        this.coin_id = bookPayload.symbol
+        this.asks = JSON.stringify(_.reduce(bookPayload.asks, reducerFunction, [[], []]))
+        this.bids = JSON.stringify(_.reduce(bookPayload.bids, reducerFunction, [[], []]))
+    }
+
+    protected getTableName(): string {
+        return 'book_entries'
+    }
+    
+}
+
 export {
-    Ticker
+    Ticker,
+    Book
 }

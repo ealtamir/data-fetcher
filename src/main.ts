@@ -6,8 +6,8 @@ import { ErrorPayload } from "./common_interfaces";
 import { BitfinexDataFetcher } from "./data_fetcher";
 import { knex } from './database';
 import { error } from "util";
-import { BitfinexAPIPayload, TickerPayload, TradesPayload, BitfinexTradeEntry } from "./bitfinex_interfaces";
-import { Ticker } from './models'
+import { BitfinexAPIPayload, TickerPayload, TradesPayload, BitfinexTradeEntry, BookPayload } from "./bitfinex_interfaces";
+import { Ticker, Book } from './models'
 import { QueryResult } from "pg";
 
 
@@ -22,7 +22,8 @@ const symbols: Array<bf.BitfinexSymbols> = [
 
 async.parallel(_.reduce(symbols, (state: any, symbol: bf.BitfinexSymbols) => {
     const makeApiCallbacks = (cb: any) => {
-        async.parallel({
+        const PARALLEL_LIMIT = 2
+        async.parallelLimit({
             tickerData: (callback: any) => {
                 let tickerParams: bf.BitfinexAPIParams = {
                     symbol: symbol,
@@ -46,8 +47,19 @@ async.parallel(_.reduce(symbols, (state: any, symbol: bf.BitfinexSymbols) => {
                     }
                 }
                 fetcher.getTradesData(tradeParams)
+            },
+            bookData: (callback: any) => {
+                let bookParams: bf.BitfinexAPIParams = {
+                    symbol: symbol,
+                    limit_asks: 10000,
+                    limit_bids: 10000,
+                    callback: (errors: ErrorPayload, payload: BookPayload): void => {
+                        callback(errors, payload)
+                    }
+                }
+                fetcher.getBookData(bookParams)
             }
-        }, (errors, results) => {
+        }, PARALLEL_LIMIT, (errors, results) => {
             cb(errors, results)
         })
     }
@@ -60,17 +72,26 @@ async.parallel(_.reduce(symbols, (state: any, symbol: bf.BitfinexSymbols) => {
     }
     async.parallel(_.map(symbols, (symbol: bf.BitfinexSymbols) => {
         return (cb: any) => {
-            let {tickerData, tradesData} = results[symbol]
+            let {tickerData, tradesData, bookData} = results[symbol]
             let tickerObject = new Ticker(tickerData, tradesData)
-            tickerObject.saveModel((errors: any, result: QueryResult): void => {
-                cb(errors, result)
+            let bookObject = new Book(bookData)
+            async.parallel([
+                callback => {
+                    tickerObject.saveModel(callback)
+                }, 
+                callback => {
+                    bookObject.saveModel(callback)
+                }
+            ], (errors, results) => {
+                cb(errors, results)
             })
         }
     }), (errors, results) => {
         if (errors) {
-            return console.log(`Got error when storing data: ${JSON.stringify(errors)}`)
+            console.log(`Got error when storing data: ${JSON.stringify(errors)}`)
+        } else {
+            console.log(`Stored data with ids: ${JSON.stringify(results)}`)
         }
-        console.log(`Stored data with ids: ${JSON.stringify(results)}`)
         knex.destroy()
     })
 

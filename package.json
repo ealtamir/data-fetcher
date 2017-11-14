@@ -19,12 +19,16 @@
     "typescript": "^2.6.1"
   },
   "devDependencies": {
-    "@types/bluebird": "^3.5.18",
-    "@types/knex": "0.0.64",
-    "@types/pg": "^7.1.5",
     "@types/async": "^2.0.45",
+    "@types/bluebird": "^3.5.18",
+    "@types/chai": "^4.0.4",
+    "@types/knex": "0.0.64",
     "@types/lodash": "^4.14.82",
-    "@types/request": "^2.0.7"
+    "@types/mocha": "^2.2.44",
+    "@types/pg": "^7.1.5",
+    "@types/request": "^2.0.7",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
