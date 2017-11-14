@@ -26,7 +26,9 @@ enum BitfinexSymbols {
     streamr = "datusd"
 }
 
-interface BitfinexAPIPayload {}
+interface BitfinexAPIPayload {
+    symbol: BitfinexSymbols;
+}
 
 interface TickerPayload extends BitfinexAPIPayload {
     last_price: number;
@@ -50,14 +52,17 @@ interface BookPayload extends BitfinexAPIPayload {
     asks: Array<BitfinexBookEntry>
 }
 
+interface BitfinexTradeEntry {
+    timestamp: number;
+    tid: string;
+    price: number;
+    amount: number;
+    type: 'buy' | 'sell'
+    exchange?: string
+}
+
 interface TradesPayload extends BitfinexAPIPayload {
-    [index: number]: {
-        timestamp: number;
-        tid: string;
-        price: number;
-        amount: number;
-        type: 'buy' | 'sell'
-    }
+    trades: BitfinexTradeEntry[]
 }
 
 interface BitfinexAPIParams {
@@ -76,5 +81,6 @@ export {
     BookPayload,
     TradesPayload,
     BitfinexAPIParams,
-    BitfinexSymbols
+    BitfinexSymbols,
+    BitfinexTradeEntry
 }

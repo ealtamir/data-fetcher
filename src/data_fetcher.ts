@@ -4,6 +4,8 @@ import * as _ from "lodash";
 import { ErrorPayload } from "./common_interfaces";
 import * as bf from "./bitfinex_interfaces";
 import * as buildUrl from "build-url";
+import { BookPayload, BitfinexSymbols, BitfinexAPIParams,
+     TradesPayload, TickerPayload } from "./bitfinex_interfaces";
 
 
 class BitfinexDataFetcher {
@@ -13,7 +15,7 @@ class BitfinexDataFetcher {
         const url = buildUrl(this.baseV1URL, {
             path: `/pubticker/${params.symbol}`
         });
-        this.makeRequest(url, params.callback)
+        this.makeRequest(url, this.responseHandler<TickerPayload>(params))
     }
 
     public getTradesData(params: bf.BitfinexAPIParams): void {
@@ -24,7 +26,7 @@ class BitfinexDataFetcher {
                 limit_trades: params.limit_trades
             }
         })
-        this.makeRequest(url, params.callback)
+        this.makeRequest(url, this.responseHandler<TradesPayload>(params))
     }
 
     public getBookData(params: bf.BitfinexAPIParams): void {
@@ -36,7 +38,21 @@ class BitfinexDataFetcher {
                 group: params.group
             }
         })
-        this.makeRequest(url, params.callback)
+        this.makeRequest(url, this.responseHandler<BookPayload>(params))
+    }
+
+    private responseHandler<T extends bf.BitfinexAPIPayload>(params: BitfinexAPIParams) {
+        return (error: any, responseBody: any) => {
+            if (error) {
+                params.callback(error, null)
+            }
+            // If type matches, response belongs to trades api request
+            if (typeof responseBody === typeof []) {
+                responseBody = { trades: responseBody }
+            }
+            responseBody.symbol = params.symbol
+            params.callback(null, responseBody as T)
+        }
     }
 
     // TODO: Think about adding retry functionality
