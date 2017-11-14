@@ -46,11 +46,6 @@ class BitfinexDataFetcher {
             if (error) {
                 params.callback(error, null)
             }
-            // If type matches, response belongs to trades api request
-            if (typeof responseBody === typeof []) {
-                responseBody = { trades: responseBody }
-            }
-            responseBody.symbol = params.symbol
             params.callback(null, responseBody as T)
         }
     }

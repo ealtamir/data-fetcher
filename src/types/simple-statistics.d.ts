@@ -665,46 +665,9 @@ export function variance(x: any): any;
 export function zScore(x: any, mean: any, standardDeviation: any): any;
 
 export namespace BayesianClassifier {
-    namespace prototype {
-        function score(item: any): any;
-
-        function train(item: any, category: any): void;
-
-        namespace score {
-            const prototype: {
-            };
-
-        }
-
-        namespace train {
-            const prototype: {
-            };
-
-        }
-
-    }
-
 }
 
 export namespace PerceptronModel {
-    namespace prototype {
-        function predict(features: any): any;
-
-        function train(features: any, label: any): any;
-
-        namespace predict {
-            const prototype: {
-            };
-
-        }
-
-        namespace train {
-            const prototype: {
-            };
-
-        }
-
-    }
 
 }
 
@@ -717,28 +680,6 @@ export namespace addToMean {
 export namespace average {
     const prototype: {
     };
-
-}
-
-export namespace bayesian {
-    namespace prototype {
-        function score(item: any): any;
-
-        function train(item: any, category: any): void;
-
-        namespace score {
-            const prototype: {
-            };
-
-        }
-
-        namespace train {
-            const prototype: {
-            };
-
-        }
-
-    }
 
 }
 
@@ -964,27 +905,6 @@ export namespace numericSort {
 
 }
 
-export namespace perceptron {
-    namespace prototype {
-        function predict(features: any): any;
-
-        function train(features: any, label: any): any;
-
-        namespace predict {
-            const prototype: {
-            };
-
-        }
-
-        namespace train {
-            const prototype: {
-            };
-
-        }
-
-    }
-
-}
 
 export namespace permutationsHeap {
     const prototype: {
