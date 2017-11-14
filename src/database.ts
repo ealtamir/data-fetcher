@@ -1,14 +1,20 @@
-import * as knexConstructor from "knex";
-import * as config from './config';
+import * as Knex from "knex"
+import * as config from './config'
+import { Client } from 'pg'
 
-const knex = knexConstructor({
+const connectionParams = {
+    user: 'enzo',
+    database: 'default_db'
+}
+
+const knex = Knex({
     dialect: 'pg',
-    connection: {
-        user: 'enzo',
-        database: 'db_default'
-    }
+    connection: connectionParams,
 })
+
+const client = new Client(connectionParams)
 
 export {
     knex,
+    client
 }

@@ -1,30 +1,20 @@
 import * as _ from 'lodash'
 import * as stats from 'simple-statistics'
 import * as Bluebird from 'bluebird'
-import { knex } from './database'
+import { knex, client } from './database'
 import {TickerPayload, TradesPayload, BitfinexTradeEntry} from './bitfinex_interfaces'
 import { Transaction } from 'knex';
+import { QueryResult } from 'pg';
 
 
 abstract class Model {
 
-    id: number = null;
-
     protected abstract getTableName(): string
 
-    public saveModel(callback: (error: any, modelIds: number | number[]) => any): void {
-        knex.transaction((trx: Transaction) => {
-            return trx
-                .insert(this, 'id')
-                .into(this.getTableName())
-                .then((id: number) => {
-                    this.id = id;
-                })
-        }).then((id) => {
-            callback(null, id)
-        }).catch((error) => {
-            callback(error, null)
-        })
+    public saveModel(callback: (error: Error, result: QueryResult) => any): void {
+        let sql = knex(this.getTableName())
+            .insert(this)
+            .asCallback(callback)
     }
 }
 
@@ -51,6 +41,10 @@ class Ticker extends Model {
 
     constructor(tickerPayload: TickerPayload, tradesPayload: TradesPayload) {
         super()
+        if (tickerPayload.symbol !== tradesPayload.symbol) {
+            Error('TickerPayload and TradesPayload belong to different currencies.')
+        }
+        this.coin_id = tickerPayload.symbol
         this.extractTickerPayloadData(tickerPayload)
         this.extractTradesPayloadData(tradesPayload)
     }
@@ -71,14 +65,14 @@ class Ticker extends Model {
         _.each(payload.trades, (trade: BitfinexTradeEntry) => {
             if (trade.type === 'buy') {
                 buy_qty += 1
-                buy_coin_qty += trade.amount
-                buy_prices.concat(trade.price)
-                buy_amounts.concat(trade.amount)
+                buy_coin_qty += +trade.amount
+                buy_prices.push(+trade.price)
+                buy_amounts.push(+trade.amount)
             } else {
                 sell_qty += 1
-                sell_coin_qty += trade.amount
-                sell_prices.concat(trade.price)
-                sell_amounts.concat(trade.amount)
+                sell_coin_qty += +trade.amount
+                sell_prices.push(+trade.price)
+                sell_amounts.push(+trade.amount)
             }
         })
         buy_prices = _.sortBy(buy_prices)
@@ -99,14 +93,17 @@ class Ticker extends Model {
     }
 
     private extractTickerPayloadData(payload: TickerPayload): void {
-        this.coin_id = payload.symbol
-        this.last_price = payload.last_price
-        this.bid = payload.bid
-        this.ask = payload.ask
-        this.mid = payload.mid
-        this.low = payload.low
-        this.high = payload.high
-        this.volume = payload.volume
+        this.last_price = +payload.last_price
+        this.bid = +payload.bid
+        this.ask = +payload.ask
+        this.mid = +payload.mid
+        this.low = +payload.low
+        this.high = +payload.high
+        this.volume = +payload.volume
     }
 
+}
+
+export {
+    Ticker
 }
