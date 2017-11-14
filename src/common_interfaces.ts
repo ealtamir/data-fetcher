@@ -5,6 +5,9 @@ interface ErrorPayload {
     errorCode: number;
 }
 
+type DefaultCallback = (errors: any, results: any) => void
+
 export {
-    ErrorPayload
+    ErrorPayload,
+    DefaultCallback
 }

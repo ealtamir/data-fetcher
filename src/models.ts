@@ -82,6 +82,18 @@ class Ticker extends Model {
         buy_amounts = _.sortBy(buy_amounts)
         sell_prices = _.sortBy(sell_prices)
         sell_amounts = _.sortBy(sell_amounts)
+        if (buy_prices.length === 0) {
+            buy_prices.push(0)
+        }
+        if (buy_amounts.length === 0) {
+            buy_amounts.push(0)
+        }
+        if (sell_prices.length === 0) {
+            sell_prices.push(0)
+        }
+        if (sell_amounts.length === 0) {
+            sell_amounts.push(0)
+        }
         this.transactions_buy_qty = buy_qty
         this.transactions_buy_coin_qty = buy_coin_qty
         this.transactions_buy_mean_price = stats.mean(buy_prices)

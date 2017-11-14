@@ -7,6 +7,7 @@ import * as buildUrl from "build-url";
 import { BookPayload, BitfinexSymbols, BitfinexAPIParams,
      TradesPayload, TickerPayload } from "./bitfinex_interfaces";
 
+const TIMEOUT = 1000
 
 class BitfinexDataFetcher {
     readonly baseV1URL: string = `https://api.bitfinex.com/v1`;
@@ -44,7 +45,7 @@ class BitfinexDataFetcher {
     private responseHandler<T extends bf.BitfinexAPIPayload>(params: BitfinexAPIParams) {
         return (error: any, responseBody: any) => {
             if (error) {
-                params.callback(error, null)
+                return params.callback(error, null)
             }
             responseBody.symbol = params.symbol
             params.callback(null, responseBody as T)
@@ -53,10 +54,12 @@ class BitfinexDataFetcher {
 
     // TODO: Think about adding retry functionality
     private makeRequest(url: string, cb: (err: ErrorPayload, payload: any) => void) {
-        request(url, (error, response, body) => {
+        console.log(`>>> Sending request to ${url}`)
+        request(url, {timeout: TIMEOUT}, (error, response, body) => {
             if (error) {
                 return cb({errorMsg: error, errorCode: response && response.statusCode}, null)
             }
+            console.log(`<<< received request from ${url}`)
             return cb(null, JSON.parse(body))
         })
     }

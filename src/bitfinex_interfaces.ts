@@ -83,5 +83,6 @@ export {
     BitfinexAPIParams,
     BitfinexSymbols,
     BitfinexTradeEntry,
-    BitfinexBookEntry
+    BitfinexBookEntry,
+    StandardCallback
 }
