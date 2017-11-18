@@ -24,7 +24,7 @@ exports.up = function (knex: Knex): Promise<any> {
             table.float('transactions_sell_median_price')
             table.timestamp('timestamp').defaultTo(knex.fn.now())
 
-            table.index(['coin_id'], 'crypto_coin')
+            table.index(['coin_id'], 'ticker_crypto_coin')
         }),
         knex.schema.createTable('book_entries', table => {
             table.increments()
@@ -33,7 +33,7 @@ exports.up = function (knex: Knex): Promise<any> {
             table.json('bids')
             table.timestamp('timestamp').defaultTo(knex.fn.now())
 
-            table.index(['coin_id'], 'crypto_coin')
+            table.index(['coin_id'], 'books_crypto_coin')
         })
     ])
 };

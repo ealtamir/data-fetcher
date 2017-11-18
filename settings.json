@@ -73,6 +73,7 @@
             "migrations": {
                 "tableName": "knex_migrations"
             }
-        }
+        },
+        "uptime_port": 3333
     }
 }

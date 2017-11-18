@@ -13,14 +13,27 @@ import {
 import { Manager } from "./manager"
 import { setTimeout } from "timers";
 import { config } from './config'
-
+import * as http from 'http';
+import { logger } from "./logger";
 
 
 const fetcher = new BitfinexDataFetcher()
 const symbols: bf.BitfinexSymbols[] = <bf.BitfinexSymbols[]>config.symbols
-
 const manager: Manager = new Manager(symbols)
+
+
 manager.start()
-setTimeout(() => {
-    manager.stop()
-}, 3 * 1000 * 60)
+if (config.environment === 'development') {
+    setTimeout(() => {
+        manager.stop()
+    }, 3 * 1000 * 60)
+} else {
+    http.createServer((request, response) => {
+        response.end("I'm up!")
+    }).listen(config.uptime_port, (err: any) => {
+        if (err) {
+            return logger.error(`Server listen triggered an error: ${JSON.stringify(err)}`)
+        }
+        return logger.info(`Started uptime server at port ${config.uptime_port}`)
+    })
+}
