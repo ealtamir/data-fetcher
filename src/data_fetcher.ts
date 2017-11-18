@@ -59,7 +59,11 @@ class BitfinexDataFetcher {
             if (error) {
                 return cb({errorMsg: error, errorCode: response && response.statusCode}, null)
             }
-            return cb(null, JSON.parse(body))
+            try {
+                return cb(null, JSON.parse(body))
+            } catch (error) {
+                return cb(error, null)
+            }
         })
     }
 
