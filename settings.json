@@ -1,0 +1,78 @@
+{
+    "global": {
+        "symbols": [
+            "btcusd",
+            "ltcusd",
+            "ethusd",
+            "etcusd",
+            "zecusd",
+            "xmrusd",
+            "dshusd",
+            "xrpusd",
+            "iotusd",
+            "eosusd",
+            "sanusd",
+            "omgusd",
+            "bchusd",
+            "neousd",
+            "etpusd",
+            "qtmusd",
+            "avtusd",
+            "edousd",
+            "btgusd",
+            "datusd"
+        ],
+        "data_fetcher": {
+            "timeout_ms": 10000
+        },
+        "pipeline": {
+            "limit_trades": 10000,
+            "limit_asks": 10000,
+            "limit_bids": 10000,
+            "group": 0
+        },
+        "manager": {
+            "pipeline_interval_ms": 60000,
+            "parallel_execution_limit": 5
+        }
+    },
+    "development": {
+        "database": {
+            "client": "postgres",
+            "dialect": "pg",
+            "pool": {
+                "min": 2,
+                "max": 10
+            },
+            "connection": {
+                "host": "localhost",
+                "port": "5432",
+                "user": "enzo",
+                "database": "default_db"
+            },
+            "migrations": {
+                "tableName": "knex_migrations"
+            }
+        }
+    },
+    "production": {
+        "database": {
+            "client": "postgres",
+            "dialect": "pg",
+            "pool": {
+                "min": 2,
+                "max": 10
+            },
+            "connection": {
+                "host": "",
+                "port": "",
+                "user": "",
+                "password": "",
+                "database": ""
+            },
+            "migrations": {
+                "tableName": "knex_migrations"
+            }
+        }
+    }
+}

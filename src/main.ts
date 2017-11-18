@@ -1,7 +1,6 @@
 import * as async from "async"
 import * as request from "request"
 import * as _ from "lodash"
-import { error } from "util"
 
 import * as bf from "./bitfinex_interfaces"
 import { ErrorPayload } from "./common_interfaces"
@@ -11,34 +10,17 @@ import {
     BitfinexAPIPayload, TickerPayload, TradesPayload,
     BitfinexTradeEntry, BookPayload, StandardCallback 
 } from "./bitfinex_interfaces"
-import { CryptoPipeline } from "./manager"
+import { Manager } from "./manager"
+import { setTimeout } from "timers";
+import { config } from './config'
 
 
 
 const fetcher = new BitfinexDataFetcher()
-const symbols: Array<bf.BitfinexSymbols> = [
-    bf.BitfinexSymbols.bitcoin,
-    bf.BitfinexSymbols.litecoin,
-    bf.BitfinexSymbols.ethereum,
-    bf.BitfinexSymbols.iota,
-    bf.BitfinexSymbols.aventus,
-]
+const symbols: bf.BitfinexSymbols[] = <bf.BitfinexSymbols[]>config.symbols
 
-let pipelines = _.map(symbols, symbol => {
-    return new CryptoPipeline(symbol)
-})
-
-const PARALLEL_LIMIT = 20
-
-async.parallelLimit(_.map(pipelines, pipeline => {
-    return (cb: StandardCallback) => {
-        pipeline.runPipeline(cb)
-    }
-}), PARALLEL_LIMIT, (errors, results) => {
-    if (errors) {
-        console.log(`Got errors: ${JSON.stringify(errors)}`)
-    } else {
-        console.log(`Succeeded storing all data: ${JSON.stringify(results)}`)
-    }
-    knex.destroy()
-})
+const manager: Manager = new Manager(symbols)
+manager.start()
+setTimeout(() => {
+    manager.stop()
+}, 3 * 1000 * 60)

@@ -1,13 +1,14 @@
 import * as _ from 'lodash'
 import * as stats from 'simple-statistics'
 import * as Bluebird from 'bluebird'
-import { knex, client } from './database'
+import { knex } from './database'
 import { 
     TickerPayload, TradesPayload, BitfinexTradeEntry, 
     BookPayload, BitfinexBookEntry
 } from './bitfinex_interfaces'
-import { Transaction } from 'knex';
-import { QueryResult } from 'pg';
+import { Transaction } from 'knex'
+import { QueryResult } from 'pg'
+import { logger } from './logger'
 
 
 abstract class Model {
@@ -17,7 +18,13 @@ abstract class Model {
     public saveModel(callback: (error: Error, result: QueryResult) => any): void {
         let sql = knex(this.getTableName())
             .insert(this)
-            .asCallback(callback)
+            .asCallback((errors: any, result: any) => {
+                if (errors) {
+                    logger.error(`Failed to save data to DB: ${JSON.stringify(errors)}.`)
+                    return callback(null, null)
+                }
+                return callback(null, result)
+            })
     }
 }
 

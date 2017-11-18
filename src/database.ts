@@ -1,20 +1,14 @@
 import * as Knex from "knex"
-import * as config from './config'
-import { Client } from 'pg'
+import { config } from './config'
+import { logger } from './logger'
 
-const connectionParams = {
-    user: 'enzo',
-    database: 'default_db'
-}
-
+logger.info('Starting database connection')
 const knex = Knex({
     dialect: 'pg',
-    connection: connectionParams,
+    connection: config.database.connection,
 })
 
-const client = new Client(connectionParams)
 
 export {
-    knex,
-    client
+    knex
 }

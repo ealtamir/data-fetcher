@@ -1,13 +1,14 @@
-import * as asyncLib from "async";
-import * as request from "request";
-import * as _ from "lodash";
-import { ErrorPayload } from "./common_interfaces";
-import * as bf from "./bitfinex_interfaces";
-import * as buildUrl from "build-url";
+import * as asyncLib from "async"
+import * as request from "request"
+import * as _ from "lodash"
+import { ErrorPayload } from "./common_interfaces"
+import * as bf from "./bitfinex_interfaces"
+import * as buildUrl from "build-url"
 import { BookPayload, BitfinexSymbols, BitfinexAPIParams,
-     TradesPayload, TickerPayload } from "./bitfinex_interfaces";
+     TradesPayload, TickerPayload } from "./bitfinex_interfaces"
+import { config } from './config'
 
-const TIMEOUT = 1000
+const TIMEOUT = config.data_fetcher.timeout_ms
 
 class BitfinexDataFetcher {
     readonly baseV1URL: string = `https://api.bitfinex.com/v1`;
@@ -54,12 +55,10 @@ class BitfinexDataFetcher {
 
     // TODO: Think about adding retry functionality
     private makeRequest(url: string, cb: (err: ErrorPayload, payload: any) => void) {
-        console.log(`>>> Sending request to ${url}`)
         request(url, {timeout: TIMEOUT}, (error, response, body) => {
             if (error) {
                 return cb({errorMsg: error, errorCode: response && response.statusCode}, null)
             }
-            console.log(`<<< received request from ${url}`)
             return cb(null, JSON.parse(body))
         })
     }

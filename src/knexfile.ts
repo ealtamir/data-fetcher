@@ -1,26 +1,8 @@
-// Update with your config settings.
+import { config } from './config'
 
-const options = {
-  client: 'postgresql',
-  connection: {
-    database: 'default_db',
-    user:     'enzo',
-  },
-  pool: {
-    min: 2,
-    max: 10
-  },
-  migrations: {
-    tableName: 'knex_migrations'
-  }
-}
 
 module.exports = {
-
-  development: options,
-
-  staging: options,
-
-  production: options
-
+  development: config.database,
+  staging: config.database,
+  production: config.database
 };

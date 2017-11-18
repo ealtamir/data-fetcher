@@ -17,7 +17,8 @@
     "request": "^2.83.0",
     "simple-statistics": "^5.1.0",
     "ts-node": "^3.3.0",
-    "typescript": "^2.6.1"
+    "typescript": "^2.6.1",
+    "winston": "^3.0.0-rc1"
   },
   "devDependencies": {
     "@types/async": "^2.0.45",
