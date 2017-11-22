@@ -26,7 +26,7 @@ manager.start()
 if (config.environment === 'development') {
     setTimeout(() => {
         manager.stop()
-    }, 3 * 1000 * 60)
+    }, 10 * 1000 * 60)
 } else {
     http.createServer((request, response) => {
         response.end("I'm up!")

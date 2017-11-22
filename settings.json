@@ -29,7 +29,8 @@
             "limit_trades": 10000,
             "limit_asks": 10000,
             "limit_bids": 10000,
-            "group": 0
+            "group": 0,
+            "trades_download_time_threshold": 5
         },
         "manager": {
             "pipeline_interval_ms": 60000,

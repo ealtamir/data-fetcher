@@ -57,7 +57,7 @@ class CryptoPipeline {
                 )
             },
             cb => {
-                let timestamp = moment().subtract(1, 'minutes').unix()
+                let timestamp = moment().subtract(config.pipeline.trades_download_time_threshold, 'minutes').unix()
                 CryptoPipeline.fetcher.getTradesData(
                     this.tradesParamsGenerator(LIMIT_TRADES, timestamp, cb)
                 )

@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import * as stats from 'simple-statistics'
-import * as Bluebird from 'bluebird'
+import * as moment from 'moment'
 import { knex } from './database'
 import { 
     TickerPayload, TradesPayload, BitfinexTradeEntry, 
@@ -9,6 +9,7 @@ import {
 import { Transaction } from 'knex'
 import { QueryResult } from 'pg'
 import { logger } from './logger'
+import { Util } from './util'
 
 
 abstract class Model {
@@ -72,7 +73,12 @@ class Ticker extends Model {
         let sell_coin_qty: number = 0
         let sell_prices: Array<number> = []
         let sell_amounts: Array<number> = []
+        const timestamp = moment().subtract(1, 'minutes')
         _.each(payload.trades, (trade: BitfinexTradeEntry) => {
+            const tradeTime = moment.unix(trade.timestamp)
+            if (timestamp.isAfter(tradeTime) || Util.formatNumber(+trade.amount) === 0 || Util.formatNumber(+trade.price) === 0) {
+                return;
+            }
             if (trade.type === 'buy') {
                 buy_qty += 1
                 buy_coin_qty += +trade.amount
@@ -103,15 +109,15 @@ class Ticker extends Model {
         }
         this.transactions_buy_qty = buy_qty
         this.transactions_buy_coin_qty = buy_coin_qty
-        this.transactions_buy_mean_price = stats.mean(buy_prices)
-        this.transactions_buy_stdev_price = stats.standardDeviation(buy_prices)
-        this.transactions_buy_median_price = stats.medianSorted(buy_prices)
+        this.transactions_buy_mean_price = Util.formatNumber(stats.mean(buy_prices))
+        this.transactions_buy_stdev_price = Util.formatNumber(stats.standardDeviation(buy_prices))
+        this.transactions_buy_median_price = Util.formatNumber(stats.medianSorted(buy_prices))
 
         this.transactions_sell_qty = sell_qty
         this.transactions_sell_coin_qty = sell_coin_qty
-        this.transactions_sell_mean_price = stats.mean(sell_prices)
-        this.transactions_sell_stdev_price = stats.standardDeviation(sell_prices)
-        this.transactions_sell_median_price = stats.medianSorted(sell_prices)
+        this.transactions_sell_mean_price = Util.formatNumber(stats.mean(sell_prices))
+        this.transactions_sell_stdev_price = Util.formatNumber(stats.standardDeviation(sell_prices))
+        this.transactions_sell_median_price = Util.formatNumber(stats.medianSorted(sell_prices))
     }
 
     private extractTickerPayloadData(payload: TickerPayload): void {
@@ -140,9 +146,11 @@ class Book extends Model {
     extractBookPayloadData(bookPayload: BookPayload): void {
         type accumulator = [number[], number[]]
         const reducerFunction = (accumulator: accumulator, item: BitfinexBookEntry): accumulator => {
-            accumulator[0].push(+item.amount)
-            accumulator[1].push(+item.price)
-            return accumulator
+            if (Util.formatNumber(+item.amount) === 0 || Util.formatNumber(+item.price) === 0) {
+                accumulator[0].push(+item.amount)
+                accumulator[1].push(+item.price)
+                return accumulator
+            }
         }
         this.coin_id = bookPayload.symbol
         this.asks = JSON.stringify(_.reduce(bookPayload.asks, reducerFunction, [[], []]))
