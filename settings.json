@@ -23,7 +23,7 @@
             "datusd"
         ],
         "data_fetcher": {
-            "timeout_ms": 10000
+            "timeout_ms": 15000
         },
         "pipeline": {
             "limit_trades": 10000,
@@ -33,7 +33,7 @@
             "trades_download_time_threshold": 5
         },
         "manager": {
-            "pipeline_interval_ms": 60000,
+            "pipeline_interval_ms": 50000,
             "parallel_execution_limit": 5
         }
     },
