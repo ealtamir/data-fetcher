@@ -149,8 +149,8 @@ class Book extends Model {
             if (Util.formatNumber(+item.amount) === 0 || Util.formatNumber(+item.price) === 0) {
                 accumulator[0].push(+item.amount)
                 accumulator[1].push(+item.price)
-                return accumulator
             }
+            return accumulator
         }
         this.coin_id = bookPayload.symbol
         this.asks = JSON.stringify(_.reduce(bookPayload.asks, reducerFunction, [[], []]))
