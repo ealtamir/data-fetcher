@@ -146,7 +146,7 @@ class Book extends Model {
     extractBookPayloadData(bookPayload: BookPayload): void {
         type accumulator = [number[], number[]]
         const reducerFunction = (accumulator: accumulator, item: BitfinexBookEntry): accumulator => {
-            if (Util.formatNumber(+item.amount) === 0 || Util.formatNumber(+item.price) === 0) {
+            if (Util.formatNumber(+item.amount) !== 0 && Util.formatNumber(+item.price) !== 0) {
                 accumulator[0].push(+item.amount)
                 accumulator[1].push(+item.price)
             }
